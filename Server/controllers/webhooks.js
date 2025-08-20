@@ -67,8 +67,8 @@ export const clerkWebhooks = async (req, res) => {
 const stripeInstance = new Stripe(process.env.STRIPE_SECRETE_KEY)
 export const stripeWebhooks = async (request, response) => {
     // Get the signature sent by Stripe
-    const event = request.body;
     const signature = request.headers['stripe-signature'];
+    let event;
     try {
         event = Stripe.webhooks.constructEvent(
             request.body,
