@@ -1,9 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import uniqid from 'uniqid'
 import Quill from 'quill'
 import { assets } from '../../assets/assets'
+import { AppContext } from '../../context/AppContext'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const AddCourse = () => {
+
+  const {getToken,backendUrl} = useContext(AppContext)
 
   const quillRef = useRef(null)
   const editorRef = useRef(null)
@@ -83,7 +88,46 @@ const AddCourse = () => {
   }
 
   const onSubmitHandler = async (e) => {
-    e.preventDefault()
+
+    try {
+      e.preventDefault()
+      if (!image) {
+        toast.error('Thumbnail Not Selected')
+      }
+
+      const courseData = {
+        courseTitle,
+        courseDescription : quillRef.current.root.innerHTML,
+        coursePrice : Number(coursePrice),
+        discount : Number(discount),
+        courseContent : chapters
+      }
+
+      const formData = new FormData()
+      formData.append('courseData',JSON.stringify(courseData))
+      formData.append('image',image)
+
+
+      const token = await getToken()
+      const {data} = await axios.post(backendUrl + '/api/educator/add-course',formData,{headers:{Authorization:`Bearer ${token}`}})
+
+      if (data.success) {
+        toast.success(data.message)
+        setCourseTitle('')
+        setCoursePrice(0)
+        setChapters([])
+        setDiscount(0)
+        setImage(null)
+         quillRef.current.root.innerHTML = ''
+      }
+      else{
+        toast.error(data.message)
+      }
+      
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message)
+    }
   }
 
   useEffect(() => {
@@ -118,9 +162,9 @@ const AddCourse = () => {
             <p>Course Thumbnail</p>
             <label htmlFor='thumbnailImage' className='flex flex-center gap-3'>
               <img src={assets.file_upload_icon} alt="" className='p-3 bg-blue-50  rounded' />
-              <input type="file" id='thumbnailImage' onChange={e => setImage(e.target.value)}
+              <input type="file" id='thumbnailImage' onChange={e => setImage(e.target.files[0])}
                 accept='image/*' hidden />
-              <img className='max-h-10' src={image ? URL.createObjectURL(image) : ''} alt="" />
+              <img className='max-h-10' src={image ? URL.createObjectURL(image) : undefined} alt="" />
             </label>
           </div>
 
@@ -203,7 +247,7 @@ const AddCourse = () => {
                   <div className='flex gap-2 my-4'>
                     <p>Is Preview Free</p>
                     <input type="checkbox" className='mt-1 block  border rounded py-1 px-2'
-                      value={lectureDetail.isPreviewFree} onChange={(e) => setlectureDetail({
+                      checked={lectureDetail.isPreviewFree} onChange={(e) => setlectureDetail({
                         ...lectureDetail, isPreviewFree: e.target.checked
                       })} />
                   </div>

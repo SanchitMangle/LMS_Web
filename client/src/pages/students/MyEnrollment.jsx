@@ -1,28 +1,50 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AppContext } from '../../context/AppContext'
-import {Line} from 'rc-progress'
+import { Line } from 'rc-progress'
 import Footer from '../../components/students/Footer'
+import axios from 'axios'
+import { toast } from 'react-toastify'
 
 const MyEnrollment = () => {
 
-  const { enrolledCourses, calculateCourseDuration,navigate } = useContext(AppContext)
+  const { enrolledCourses, calculateCourseDuration, navigate, fetchUserEnrolledCourses, backendUrl, userData, getToken, calculateNoOfLectures } = useContext(AppContext)
 
-  const [progressArray, setProgresArray] = useState([
-    { lectureCompleted: 2, totalLecture: 4 },
-    { lectureCompleted: 1, totalLecture: 5 },
-    { lectureCompleted: 3, totalLecture: 6 },
-    { lectureCompleted: 4, totalLecture: 4 },
-    { lectureCompleted: 0, totalLecture: 3 },
-    { lectureCompleted: 5, totalLecture: 7 },
-    { lectureCompleted: 6, totalLecture: 8 },
-    { lectureCompleted: 2, totalLecture: 6 },
-    { lectureCompleted: 4, totalLecture: 10 },
-    { lectureCompleted: 3, totalLecture: 5 },
-    { lectureCompleted: 7, totalLecture: 7 },
-    { lectureCompleted: 1, totalLecture: 4 },
-    { lectureCompleted: 0, totalLecture: 2 },
-    { lectureCompleted: 5, totalLecture: 5 },
-  ])
+  const [progressArray, setProgresArray] = useState([])
+
+  const getCourseProgress = async () => {
+
+    try {
+
+      const token = await getToken()
+      const tempProgressArray = await Promise.all(
+        enrolledCourses.map(async (course) => {
+          const { data } = await axios.post(`${backendUrl}/api/user/get-course-progress`, { courseId: course._id }, { headers: { Authorization: `Bearer ${token}` } })
+          let totalLecture = calculateNoOfLectures(course)
+          const lectureCompleted = data.progressData ? data.progressData.lectureCompleted.length : 0
+          return { totalLecture, lectureCompleted }
+        })
+      )
+
+      setProgresArray(tempProgressArray)
+
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message)
+    }
+
+  }
+
+  useEffect(()=>{
+    if (userData) {
+      fetchUserEnrolledCourses()
+    }
+  },[userData])
+
+  useEffect(()=>{
+    if (enrolledCourses.length > 0 ) {
+      getCourseProgress()
+    }
+  },[enrolledCourses])
 
   return (
     <>
@@ -45,7 +67,7 @@ const MyEnrollment = () => {
                     <img src={course.courseThumbnail} alt="" className='w-14 sm:w-24 md:w-25' />
                     <div className='flex-1'>
                       <p className='mb-1 max-sm:text-sm'>{course.courseTitle}</p>
-                      <Line strokeWidth={2} percent={progressArray[index] ? (progressArray[index].lectureCompleted * 100)/progressArray[index].totalLecture : 0 } className='bg-gray-300 rounded-full'/>
+                      <Line strokeWidth={2} percent={progressArray[index] ? (progressArray[index].lectureCompleted * 100) / progressArray[index].totalLecture : 0} className='bg-gray-300 rounded-full' />
                     </div>
                   </td>
                   <td className='px-4 py-3 max-sm:hidden'>
@@ -55,7 +77,7 @@ const MyEnrollment = () => {
                     {progressArray[index] && `${progressArray[index].lectureCompleted} / ${progressArray[index].totalLecture}`} <span>Lectures</span>
                   </td>
                   <td className='px-4 py-3 max-sm:text-right'>
-                    <button className='px-3 sm:px-5 py-1.5 sm:py-2 bg-blue-600 max-sm:text-xs text-white rounded' onClick={()=>navigate('/player/'+course._id)}>
+                    <button className='px-3 sm:px-5 py-1.5 sm:py-2 bg-blue-600 max-sm:text-xs text-white rounded' onClick={() => navigate('/player/' + course._id)}>
                       {progressArray[index] && progressArray[index].lectureCompleted / progressArray[index].totalLecture === 1 ? 'Completed' : 'On Going'}
                     </button>
                   </td>
@@ -65,7 +87,7 @@ const MyEnrollment = () => {
           </tbody>
         </table>
       </div>
-      <Footer/>
+      <Footer />
     </>
   )
 }

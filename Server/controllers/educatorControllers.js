@@ -1,7 +1,8 @@
-import { clerkClient } from '@clerk/express'
+import { clerkClient,  } from '@clerk/express'
 import { v2 as cloudinary } from 'cloudinary'
 import Course from '../models/course.js';
 import Purchase from '../models/purchase.js';
+import User from '../models/User.js'
 
 
 // Update rple to educator
@@ -98,7 +99,7 @@ export const educatorDashboardData = async (req, res) => {
         for (const course of courses) {
             const students = await User.find({
                 _id: { $in: course.enrolledStudents }
-            }, 'name imageurl');
+            }, 'name imageUrl');
 
             students.forEach(student => {
                 enrolledStudentsData.push({

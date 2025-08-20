@@ -111,7 +111,7 @@ export const updateUserCouresProgress = async (req, res) => {
 
         if (progressData) {
             if (progressData.lectureCompleted.includes(lectureId)) {
-                res.jsom({ success: true, message: 'Lecture Already Completed' })
+                res.json({ success: true, message: 'Lecture Already Completed' })
             }
 
             progressData.lectureCompleted.push(lectureId)
@@ -173,7 +173,7 @@ export const addUserRating = async (req, res) => {
 
         const user = await User.findById(userId)
 
-        if (!user || user.enrolledCourses.includes(courseId)) {
+        if (!user || !user.enrolledCourses.includes(courseId)) {
             res.json({ success: false, message: 'User has not purchased this course' })
         }
 
@@ -187,7 +187,7 @@ export const addUserRating = async (req, res) => {
         }
 
         await course.save()
-        return res.jsom({ success: true, message: "Rating Added" })
+        return res.json({ success: true, message: "Rating Added" })
 
     } catch (error) {
         console.log(error);

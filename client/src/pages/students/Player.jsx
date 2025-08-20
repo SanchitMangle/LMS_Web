@@ -7,21 +7,31 @@ import { useParams } from 'react-router-dom'
 import YouTube from 'react-youtube'
 import Footer from '../../components/students/Footer'
 import Rating from '../../components/students/Rating'
+import axios from 'axios'
+import { toast } from 'react-toastify'
+import Loading from '../../components/students/Loading'
 
 const Player = () => {
 
-  const { calculateCourseChapterTime, enrolledCourses } = useContext(AppContext)
+  const { calculateCourseChapterTime, enrolledCourses, fetchUserEnrolledCourses, backendUrl, userData, getToken } = useContext(AppContext)
   const { courseId } = useParams()
 
   const [courseData, setCourseData] = useState(null)
   const [openSections, setOptionSections] = useState({})
   const [playerData, setPlayerData] = useState(null)
+  const [progressData, setProgressData] = useState(null)
+  const [initialRating, setInitialRating] = useState(0)
 
 
   const getCourseData = () => {
     enrolledCourses.map((course) => {
       if (course._id === courseId) {
         setCourseData(course)
+        course.courseRatings.map((item) => {
+          if (item.userId === userData._id) {
+            setInitialRating(item.rating)
+          }
+        })
       }
     })
   }
@@ -35,11 +45,82 @@ const Player = () => {
   }
 
   useEffect(() => {
-    getCourseData()
+    if (enrolledCourses.length > 0) {
+      getCourseData()
+    }
 
   }, [enrolledCourses])
 
-  return (
+  const markLectureCompleted = async (lectureId) => {
+
+    try {
+
+      const token = await getToken()
+      const { data } = await axios.post(backendUrl + '/api/user/update-course-progress', { courseId, lectureId }, { headers: { Authorization: `Bearer ${token}` } })
+
+      if (data.success) {
+        toast.success(data.message)
+        getCourseProgress()
+      }
+      else {
+        toast.error(data.message)
+      }
+
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message)
+    }
+
+  }
+
+  const getCourseProgress = async () => {
+
+    try {
+
+      const token = await getToken()
+      const { data } = await axios.post(backendUrl + '/api/user/get-course-progress', { courseId }, { headers: { Authorization: `Bearer ${token}` } })
+
+      if (data.success) {
+        setProgressData(data.progressData)
+      }
+      else {
+        toast.error(data.message)
+      }
+
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message)
+    }
+
+  }
+
+  const HandleRating = async (rating) => {
+
+    try {
+
+      const token = await getToken()
+      const { data } = await axios.post(backendUrl + '/api/user/add-rating', { courseId, rating }, { headers: { Authorization: `Bearer ${token}` } })
+
+      if (data.success) {
+        toast.success(data.message)
+        fetchUserEnrolledCourses()
+      }
+      else {
+        toast.error(data.message)
+      }
+
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message)
+    }
+
+  }
+
+  useEffect(() => {
+    getCourseProgress()
+  }, [])
+
+  return courseData ? (
     <>
       <div className='p-4 sm:p-10 flex flex-col-reverse md:grid md:grid-cols-2 gap-10 md:px-36'>
 
@@ -65,12 +146,12 @@ const Player = () => {
                       {
                         chapter.chapterContent.map((lecture, index) => (
                           <li key={index} className='flex items-start gap-2 py-1'>
-                            <img src={false ? assets.blue_tick_icon : assets.play_icon} alt="" className='h-4 w-4 mt-1' />
+                            <img src={progressData && progressData.lectureCompleted.includes(lecture.lectureId) ? assets.blue_tick_icon : assets.play_icon} alt="" className='h-4 w-4 mt-1' />
                             <div className='flex items-center justify-between w-full text-gray-800 text-xs md:text-default'>
                               <p>{lecture.lectureTitle}</p>
                               <div className='flex gap-1'>
                                 {lecture.lectureUrl && <p onClick={() => setPlayerData({
-                                ...lecture,chapter:index+1,lecture: index + 1
+                                  ...lecture, chapter: index + 1, lecture: index + 1
                                 })}
                                   className='text-blue-500 cursor-pointer'>Watch</p>}
                                 <p>{humanizeDuration(lecture.lectureDuration * 60 * 1000, { units: ['h', 'm'] })}</p>
@@ -87,7 +168,7 @@ const Player = () => {
           </div>
           <div className='flex items-center gap-2 py-3 mt-10'>
             <h1 className='text-xl font-bold'>Rate this course :</h1>
-            <Rating intialRating={0}/>
+            <Rating initialRating={initialRating} onRate={HandleRating} />
           </div>
         </div>
 
@@ -95,22 +176,22 @@ const Player = () => {
 
         <div className='md:mt-10'>
           {
-            playerData ? 
-            <div>
-               <YouTube videoId={playerData.lectureUrl.split('/').pop()} iframeClassName='w-full aspect-video' />
-               <div className='flex item-center justify-between mt-1'>
-                <p>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle}</p>
-                <button className='text-blue-600'>{false ? 'Completed' : 'Mark as Comlete ' }</button>
-               </div>
-            </div>
-            : <img src={courseData ? courseData.courseThumbnail : ''} alt="" />
+            playerData ?
+              <div>
+                <YouTube videoId={playerData.lectureUrl.split('/').pop()} iframeClassName='w-full aspect-video' />
+                <div className='flex item-center justify-between mt-1'>
+                  <p>{playerData.chapter}.{playerData.lecture} {playerData.lectureTitle}</p>
+                  <button onClick={() => markLectureCompleted(playerData.lectureId)} className='text-blue-600'>{progressData && progressData.lectureCompleted.includes(playerData.lectureId) ? 'Completed' : 'Mark as Comlete '}</button>
+                </div>
+              </div>
+              : <img src={courseData ? courseData.courseThumbnail : ''} alt="" />
           }
         </div>
 
       </div>
-      <Footer/>
+      <Footer />
     </>
-  )
+  ) : <Loading />
 }
 
 export default Player

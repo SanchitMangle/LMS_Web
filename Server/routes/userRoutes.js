@@ -9,7 +9,7 @@ userRouter.post('/purchase',purchaseCourse)
 
 userRouter.post('/update-course-progress',updateUserCouresProgress)
 userRouter.post('/get-course-progress',getUserCourseProgress)
-userRouter.post('/get-user-rating',addUserRating)
+userRouter.post('/add-rating',addUserRating)
 
 
 export default userRouter
