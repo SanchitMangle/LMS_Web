@@ -2,16 +2,20 @@ import { createContext, useEffect, useState } from "react";
 import { dummyCourses } from "../assets/assets";
 import { useNavigate } from "react-router-dom";
 import humanizeDuration from 'humanize-duration'
-
+import { useAuth, useUser } from '@clerk/clerk-react'
 
 export const AppContext = createContext()
 export const AppContextProvider = (props) => {
+
+    const { getToken } = useAuth()
+    const { user } = useUser()
+
 
     const navigate = useNavigate()
     const currency = import.meta.env.VITE_CURRENCY
     const [allCourses, setAllCourses] = useState([])
     const [isEducator, setIsEducator] = useState(true)
-    const [enrolledCourses,setEnrolledCourses] = useState([])
+    const [enrolledCourses, setEnrolledCourses] = useState([])
 
     const fetchAllCourses = () => {
         setAllCourses(dummyCourses)
@@ -44,7 +48,7 @@ export const AppContextProvider = (props) => {
         let time = 0
         course.courseContent.map((chapter) => chapter.chapterContent.map(
             (lecture) => time += lecture.lectureDuration))
-        return humanizeDuration(time * 60 * 1000 ,{units:['h','m']})
+        return humanizeDuration(time * 60 * 1000, { units: ['h', 'm'] })
     }
 
     // function to calculate total lectures in course
@@ -60,7 +64,7 @@ export const AppContextProvider = (props) => {
 
     // fetch user enrolled courses
 
-    const fetchUserEnrolledCourses = () =>{
+    const fetchUserEnrolledCourses = () => {
         setEnrolledCourses(dummyCourses)
     }
 
@@ -69,13 +73,24 @@ export const AppContextProvider = (props) => {
         fetchUserEnrolledCourses()
     }, [])
 
+    const logToken = async () => {
+        console.log(await getToken());
+
+    }
+
+    useEffect(() => {
+        if (user) {
+            logToken()
+        }
+    }, [user])
+
 
 
     const value = {
         currency, allCourses, navigate,
         calculateRating, isEducator, setIsEducator,
-        calculateCourseChapterTime,calculateCourseDuration,
-        calculateNoOfLectures,setEnrolledCourses,enrolledCourses,
+        calculateCourseChapterTime, calculateCourseDuration,
+        calculateNoOfLectures, setEnrolledCourses, enrolledCourses,
         fetchUserEnrolledCourses
     }
 
