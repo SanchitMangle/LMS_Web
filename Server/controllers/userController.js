@@ -67,7 +67,7 @@ export const purchaseCourse = async (req, res) => {
 
         // Stripe gatway Initillization
         const stripeInstance = new Stripe(process.env.STRIPE_SECRETE_KEY)
-        const currency = process.env.CURRENCY.toLocaleLowerCase()
+        const currency = process.env.CURRENCY.toLowerCase()
 
         // creating line items for stripe
         const line_items = [{
