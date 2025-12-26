@@ -18,10 +18,12 @@ await connectCloudinary()
 
 
 // Middlwear
-const allowedOrigins = ['http://localhost:5173', 'https://lms-web-frontend.vercel.app']
-
 app.use(cors({
-    origin: allowedOrigins,
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        callback(null, true); 
+    },
     credentials: true,
     maxAge: 86400,
 }))
