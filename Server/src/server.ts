@@ -18,7 +18,13 @@ await connectCloudinary()
 
 
 // Middlwear
-app.use(cors())
+const allowedOrigins = ['http://localhost:5173', 'https://lms-web-frontend.vercel.app']
+
+app.use(cors({
+    origin: allowedOrigins,
+    credentials: true,
+    maxAge: 86400,
+}))
 app.use(clerkMiddleware())
 
 
