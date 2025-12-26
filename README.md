@@ -1,109 +1,126 @@
-# 🎓 Full Stack Learning Management System (LMS) Website
+# 🎓 Enterprise LMS Platform (2025 Standard)
 
-A full-featured **Learning Management System (LMS)** built using the **MERN Stack**.  
-This platform allows **educators** to publish courses online and **students** to enroll, purchase, and watch courses seamlessly.  
+A modern, production-ready **Learning Management System (LMS)** built with the **MERN Stack** and **TypeScript**.  
+Re-engineered for scalability, accessibility, and a premium "Glass/Indigo" UI experience.
 
 ---
 
-## 📖 Overview
+## 🚀 Key Enterprise Features
 
-This project includes features for both **educators** and **students**:
+### For Students
 
-- 👨‍🏫 **Educators** can create and publish courses.
-- 👩‍🎓 **Students** can register, enroll, and learn through structured courses.
-- 🔐 **Authentication** is handled by [Clerk](https://clerk.com/) with prebuilt UI components.
-- 💳 **Payments** are processed through **Stripe**, enabling students to purchase courses online.
-- 📊 A scalable **MERN stack** implementation ensures smooth performance.
+- **Interactive Home Page**: Premium animations (Framer Motion), glassmorphism effects, and staggered grid layouts.
+- **Detailed Course View**: Sticky purchase cards, course content preview with "Free/Paid" badges.
+- **Learning Experience**: Video player, progress tracking, and seamless lesson navigation.
+- **Dark Mode**: Fully supported native dark mode for eye comfort.
+
+### For Educators
+
+- **Workspace Dashboard**: **Skeleton Screens** for instant feedback, interactive Revenue Charts (Recharts), and enrollment stats.
+- **Course Builder**: Modular "Add Course" flow with **Lecture & Quiz Management** (custom modal architecture).
+- **Smart Experience**: Guided usage with "Smart Empty States" and validation.
+- **Management**: Track enrollments, earnings, and course status.
+
+### Platform & Tech
+
+- **Authentication**: Clerk (Secure User Management).
+- **Payments**: Stripe Integration.
+- **Clean Architecture**: Decoupled UI and Business Logic.
 
 ---
 
 ## 🛠️ Tech Stack
 
-**Frontend:** React.js, Tailwind CSS  
-**Backend:** Node.js, Express.js  
-**Database:** MongoDB, Mongoose  
-**Authentication:** Clerk (Sign-up, Sign-in, Profile management)  
-**Payments:** Stripe Payment Gateway  
-**Hosting:** Vercel (Backend), Vercel (Frontend)
+### Frontend
+
+- **Framework**: React 18 + TypeScript + Vite
+- **Styling**: Tailwind CSS (Semantic Design Tokens)
+- **Components**: Radix UI Primitives + Custom "Shadcn-like" Library
+- **Motion**: Framer Motion (Page Transitions, Scroll Animations)
+- **Icons**: Lucide React
+
+### Backend
+
+- **Runtime**: Node.js + Express + TypeScript
+- **Database**: MongoDB + Mongoose
+- **Security**: Helper middlewares, JWT verification (where Clerk isn't used).
 
 ---
 
-## ✨ Features
+## 📦 Architecture Highlights
 
-### 👨‍🏫 Educators
-- Publish and manage courses
-- Add course details (title, description, videos, price)
-- View student enrollments
+This project follows a **Feature-Driven & Component-Based** architecture:
 
-### 👩‍🎓 Students
-- Register and login using Clerk
-- Browse and enroll in courses
-- Make secure online payments using Stripe
-- Access purchased courses anytime
-
-### ⚙️ Platform
-- Authentication & user management with Clerk’s ready-to-use components
-- Stripe-powered secure payments
-- Responsive design with Tailwind
-- MERN stack scalability
+- `client/src/components/ui/`: Reusable primitives (Button, Card, Skeleton).
+- `client/src/components/students/` & `educators/`: Domain-specific components.
+- `client/src/pages/`: Route-based pages.
+- `client/src/context/`: Global App State (Currency, Auth).
 
 ---
 
 ## 🚀 Installation & Setup
 
 1. **Clone the repository**
-```bash
-git clone https://github.com/SanchitMangle/LMS_Web.git
-cd LMS_Web
-# 🎓 Full Stack Learning Management System (LMS) Website
 
-A full-featured **Learning Management System (LMS)** built using the **MERN Stack**.  
-This platform allows **educators** to publish courses online and **students** to enroll, purchase, and watch courses seamlessly.  
+   ```bash
+   git clone https://github.com/SanchitMangle/LMS_Web.git
+   cd LMS_Web
+   ```
 
-Install dependencies
+2. **Install Dependencies**
 
-# Backend
-cd backend
-npm install
+   ```bash
+   # Backend
+   cd Server
+   npm install
 
-# Frontend
-cd ../frontend
-npm install
-Setup environment variables
+   # Frontend
+   cd ../client
+   npm install
+   ```
 
-Create .env files for both backend and frontend.
+3. **Environment Setup**
+   Create `.env` files in `Server` and `client` folders using the provided `.env.example` (or your keys).
 
-Backend .env
+   **Server/.env**
 
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-STRIPE_SECRET_KEY=your_stripe_secret_key
-CLERK_SECRET_KEY=your_clerk_secret_key
-Frontend .env
+   ```env
+   PORT=5000
+   MONGO_URI=mongodb+srv://...
+   CLERK_SECRET_KEY=sk_...
+   STRIPE_SECRET_KEY=sk_...
+   ```
 
-VITE_BACKEND_URL=http://localhost:5000
-VITE_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
-VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
-Run the application
+   **client/.env**
 
-# Start backend
-cd backend
-npm run dev
+   ```env
+   VITE_CLERK_PUBLISHABLE_KEY=pk_...
+   VITE_BACKEND_URL=http://localhost:5000
+   ```
 
-# Start frontend
-cd ../frontend
-npm run dev
-.
-├── backend/         # Express server, APIs, models
-├── frontend/        # React application
-├── screenshots/     # Project screenshots
-├── README.md
-└── ...
-bash```
+4. **Run the Application**
 
-🌐 Live Demo
-🔗 Live Site: https://lms-web-frontend.vercel.app/
-💻 GitHub Repo: https://github.com/SanchitMangle/LMS_Web
+   ```bash
+   # Terminal 1 (Backend)
+   cd Server && npm run dev
 
+   # Terminal 2 (Frontend)
+   cd client && npm run dev
+   ```
 
+---
 
+## 🎨 UI/UX Philosophy
+
+- **Glassmorphism**: Subtle transparencies and blurs for depth.
+- **Motion**: Purposeful animations to guide user attention (SlideUp, FadeIn).
+- **Accessibility**: Semantic HTML, proper contrast (Light/Dark), and keyboard navigation.
+
+---
+
+## 📝 Recent Updates (Phase 8 & 9)
+
+- **Enterprise Elevation**: Decoupled Forms, Skeleton Loading, Sidebar Refactor.
+- **Theme Polish**: Full Dark Mode audit and implementation.
+
+---
